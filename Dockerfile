@@ -1,7 +1,5 @@
 FROM ubuntu:24.04
 
-MAINTAINER none <none@none.edu>
-
 ARG REVISION=master
 ENV RAILS_ENV development
 ENV GEM_HOME /opt/canvas/.gems
@@ -11,11 +9,13 @@ ENV YARN_VERSION yarn=1.19.1-1
 RUN apt-get update \
     && apt-get -y install curl software-properties-common \
     && add-apt-repository -y ppa:instructure/ruby \
-    && apt-get update \
-    && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
-    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
-    && apt-get update \
-    && apt-get install -y ruby3.1 ruby3.1-dev zlib1g-dev libxml2-dev \
+    && apt-get update 
+    
+RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - 
+
+RUN apt-get update && apt-get install -y ruby3.1 ruby3.1-dev zlib1g-dev libxml2-dev \
         libsqlite3-dev postgresql-14 libpq-dev \
         libxmlsec1-dev libyaml-dev curl build-essential
 
@@ -28,14 +28,13 @@ RUN apt-get update \
     && apt-get update \ 
     && apt-get install nodejs -y
 
-RUN -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
-    && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-    && apt-get update \
-    && apt-get install -y --no-install-recommends \
-        yarn=1.19.1-1 \
-        unzip \
-        fontforge
+RUN -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - 
+
+RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - 
+
+RUN echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+
+RUN apt-get update && apt-get install -y --no-install-recommends yarn=1.19.1-1 
 
 RUN apt-get clean && rm -Rf /var/cache/apt
 
