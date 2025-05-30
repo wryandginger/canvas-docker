@@ -13,9 +13,7 @@
 
 ## Running
 
-`docker run --name canvas-docker -p 3000:3000 -d lbjay/canvas-docker`
-
-This repo is [registered](https://registry.hub.docker.com/u/lbjay/canvas-docker/) at Docker Hub as an automated build. So you should also be able to `docker pull lbjay/canvas-docker` to get the pre-built image.
+`docker run --name canvas-docker -p 3000:3000 -d wryandginger/canvas-docker`
 
 ## Building
 
