@@ -1,29 +1,39 @@
-FROM ubuntu:14.04
+FROM ubuntu:24.04
 
-MAINTAINER Jay Luker <jay_luker@harvard.edu>
+MAINTAINER none <none@none.edu>
 
 ARG REVISION=master
 ENV RAILS_ENV development
 ENV GEM_HOME /opt/canvas/.gems
-ENV YARN_VERSION 0.27.5-1
+ENV YARN_VERSION yarn=1.19.1-1
 
 # add nodejs and recommended ruby repos
 RUN apt-get update \
     && apt-get -y install curl software-properties-common \
-    && add-apt-repository -y ppa:brightbox/ruby-ng \
+    && add-apt-repository -y ppa:instructure/ruby \
     && apt-get update \
-    && apt-get install -y ruby2.4 ruby2.4-dev supervisor redis-server \
-        zlib1g-dev libxml2-dev libxslt1-dev libsqlite3-dev postgresql \
-        postgresql-contrib libpq-dev libxmlsec1-dev curl make g++ git \
-        unzip fontforge libicu-dev
+    && sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list' \
+    && wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add - \
+    && apt-get update \
+    && apt-get install -y ruby3.1 ruby3.1-dev zlib1g-dev libxml2-dev \
+        libsqlite3-dev postgresql-14 libpq-dev \
+        libxmlsec1-dev libyaml-dev curl build-essential
 
-RUN curl -sL https://deb.nodesource.com/setup_6.x | bash \
+RUN apt-get update \
+    && apt-get -y install curl ca-certificates curl gnupg \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg \
+        NODE_MAJOR=18 \
+    && echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list \
+    && apt-get update \ 
+    && apt-get install nodejs -y
+
+RUN -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - \
     && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
-    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list \
+    && echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
     && apt-get update \
     && apt-get install -y --no-install-recommends \
-        nodejs \
-        yarn="$YARN_VERSION" \
+        yarn=1.19.1-1 \
         unzip \
         fontforge
 
